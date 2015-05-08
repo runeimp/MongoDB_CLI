@@ -1,7 +1,7 @@
 MongoDB CLI
 ===========
 
-This is a simple CLI script for managing a local `mongod` instance.
+This is a simple Bash CLI script for managing a local `mongod` instance.
 
 
 Installation
@@ -30,6 +30,10 @@ mongodb storage
 mongodb version
 ```
 
+### `ostype`
+
+This is a simple Bash script to get general platform information. Included as a helper for `mongodb`. It's not as detailed as some that are available as the deep Exim os-type script.
+
 
 Rational
 --------
@@ -41,7 +45,7 @@ ToDo
 ----
 
 * [ ] Add `setup` command to auto link the scripts
-* [ ] &hellip;
+* [ ] Stuff, reasons, &hellip;
 
 [launchctl]:https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/launchctl.1.html
 [launchd]:http://en.wikipedia.org/wiki/Launchd
