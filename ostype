@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+###########
+# ostype SWITCH
+#
+# @author   RuneImp <runeimp@gmail.com>
+# @version  0.1.0
+# @license  http://opensource.org/licenses/MIT
+#
+###
+# show_usage:
+# ------
+# $ ostype
+# $ ostype -p
+# $ ostype --platform
+# 
+###
+# Installation
+# ------------
+# 1. ostype must be in your path and executable.
+# 
+###
+# Error Codes:
+# ------------
+#  1 = WFT?
+#
+###
+# ChangeLog:
+# ----------
+# 2015-04-30	v0.1.0	Initial script creation
+# 
+###
+# ToDo:
+# -----
+# [ ] ____
+#
+
+OSTYPE_VERSION="0.1.0"
+OS_BSD="BSD" # BSD based UNIX: BSDi, FreeBSD, NetBSD, OpenBSD, etc.
+OS_CYGWIN="Cygwin" # POSIX environment for Windows
+OS_LINUX="Linux"
+OS_INTERIX="Interix" # Windows Services for UNIX
+OS_MINGW="MinGW"
+OS_MSYS="MSys" # Part of MinGW (Minimal GNU for Windows)
+OS_NONSTOP="NonStop"
+OS_OSX="OS X"
+OS_SOLARIS="Solaris"
+OS_SUNOS="SunOS"
+OS_UWIN="UWIN" # AT&T Unix subsystem for Windows
+OS_WIN32="Windows 32-bit" # Win95, Win98, WinME, etc.
+OS_WINNT="Windows NT" # WinNT, Win2K, WinXP, WinVista, Win7+
+
+uname="$(uname -s)"
+
+case "$uname" in
+	*BSD)		OS="$OS_BSD" ;;
+	*BSDi)		OS="$OS_BSD" ;;
+	"BSD/OS")	OS="$OS_BSD" ;;
+	CYGWIN*)	OS="$OS_CYGWIN" ;;
+	Darwin)		OS="$OS_OSX" ;;
+	GNU)		OS="$OS_LINUX" ;;
+	MINGW*)		OS="$OS_MINGW" ;;
+	NONSTOP*)	OS="$OS_NONSTOP" ;;
+	Solaris*)	OS="$OS_SOLARIS" ;;
+	UWIN*)		OS="$OS_UWIN" ;;
+	win32)		OS="$OS_WIN32" ;;
+	win64)		OS="$OS_WIN64" ;; # I'm guessing on this one. ~RuneImp
+	*)			OS="$system" ;;
+esac
+
+if [[ "$1" == '-p' || "$1" == '--platform' ]]; then
+	echo "$uname"
+elif [[ "$1" == '-s' || "$1" == '--system' ]]; then
+	echo "$OS"
+elif [[ "$1" == '-h' || "$1" == '--help' ]]; then
+	echo "ostype v$OSTYPE_VERSION"
+	echo
+	echo "Valid Switches"
+	echo "--------------"
+	echo "  -h, --help       Show this help"
+	echo "  -p, --platform   Show platform information"
+	echo "  -s, --system     Show system information (the default)"
+	echo "  -v, --version    Show the version of ostype"
+	echo
+elif [[ "$1" == '-v' || "$1" == '--version' ]]; then
+	echo "ostype v$OSTYPE_VERSION"
+else
+	echo "$OS"
+fi

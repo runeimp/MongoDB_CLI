@@ -3,7 +3,7 @@
 # mongodb COMMAND
 #
 # @author   RuneImp <runeimp@gmail.com>
-# @version  0.2.1
+# @version  0.3.0
 # @license  http://opensource.org/licenses/MIT
 #
 ###
@@ -25,6 +25,7 @@
 ###
 # ChangeLog:
 # ----------
+# 2015-04-30	v0.3.0	Setup config system
 # 2015-04-30	v0.2.1	Fixed JSON output for 'info build' and status.
 # 2015-04-29	v0.2.0	Added the 'info build', 'info storage', status, and version commands.
 #						Added OS detection
@@ -37,45 +38,16 @@
 # [ ] ____
 #
 
-OS_BSD="BSD" # BSD based UNIX: BSDi, FreeBSD, NetBSD, OpenBSD, etc.
-OS_CYGWIN="Cygwin" # POSIX environment for Windows
-OS_LINUX="Linux"
-OS_INTERIX="Interix" # Windows Services for UNIX
-OS_MINGW="MinGW"
-OS_MSYS="MSys" # Part of MinGW (Minimal GNU for Windows)
-OS_NONSTOP="NonStop"
-OS_OSX="OS X"
-OS_SOLARIS="Solaris"
-OS_SUNOS="SunOS"
-OS_UWIN="UWIN" # AT&T Unix subsystem for Windows
-OS_WIN32="Windows 32-bit" # Win95, Win98, WinME, etc.
-OS_WINNT="Windows NT" # WinNT, Win2K, WinXP, WinVista, Win7+
+uname=`uname`
+OS=`ostype`
 
-uname="$(uname -s)"
+source "$user_config"
 
-case "$uname" in
-	*BSD)		OS="$OS_BSD" ;;
-	*BSDi)		OS="$OS_BSD" ;;
-	"BSD/OS")	OS="$OS_BSD" ;;
-	CYGWIN*)	OS="$OS_CYGWIN" ;;
-	Darwin)		OS="$OS_OSX" ;;
-	GNU)		OS="$OS_LINUX" ;;
-	MINGW*)		OS="$OS_MINGW" ;;
-	NONSTOP*)	OS="$OS_NONSTOP" ;;
-	Solaris*)	OS="$OS_SOLARIS" ;;
-	UWIN*)		OS="$OS_UWIN" ;;
-	win32)		OS="$OS_WIN32" ;;
-	win64)		OS="$OS_WIN64" ;; # I'm guessing on this one. ~RuneImp
-	*)			OS="$system" ;;
-esac
-
-# echo "\$uname: $uname"
-# echo "\$OS: $OS"
+# echo "\$OS: $OS ($uname)"
+# echo "\$db_path: $db_path"
+# echo "\$db_store: $db_store"
+# echo "\$log_path: $log_path"
 # exit 0
-
-db_path="/usr/local/var/mongodb/wiredTiger"
-db_store="wiredTiger" # wiredTiger or mmapv1
-log_path="/usr/local/var/log/mongodb/output.log"
 
 if [ $# -eq 0 ]; then
 	echo
@@ -113,13 +85,11 @@ else
 	elif [ $1 == 'info' ]; then
 		if [[ $2 == 'build' ]]; then
 			mongo --quiet --eval 'JSON.stringify( db.runCommand("buildInfo"), null, 4 )'
-		elif [[ $2 == 'storage' ]]; then
-			mongo --quiet --eval "db.serverStatus().storageEngine.name"
-		else
-			mongod --sysinfo
 		fi
 	elif [ $1 == 'status' ]; then
 		mongo --quiet --eval "JSON.stringify( db.serverStatus(), null, 4 )"
+	elif [[ $2 == 'storage' ]]; then
+		mongo --quiet --eval "db.serverStatus().storageEngine.name"
 	elif [ $1 == 'version' ]; then
 		mongod --version
 	else
