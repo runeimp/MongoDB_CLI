@@ -3,7 +3,7 @@
 # mongodb COMMAND
 #
 # @author   RuneImp <runeimp@gmail.com>
-# @version  0.1.1
+# @version  0.2.0
 # @license  http://opensource.org/licenses/MIT
 #
 ###
@@ -25,8 +25,10 @@
 ###
 # ChangeLog:
 # ----------
-#	2015-04-28	v0.1.1	Updated installation comments
-#	2015-04-24	v0.1.0	Initial script creation
+# 2015-04-29	v0.2.0	Added the 'info build', 'info storage', status, and version commands.
+#						Added OS detection
+# 2015-04-28	v0.1.1	Updated installation comments
+# 2015-04-24	v0.1.0	Initial script creation
 # 
 ###
 # ToDo:
@@ -34,37 +36,93 @@
 # [ ] ____
 #
 
+OS_BSD="BSD" # BSD based UNIX: BSDi, FreeBSD, NetBSD, OpenBSD, etc.
+OS_CYGWIN="Cygwin" # POSIX environment for Windows
+OS_LINUX="Linux"
+OS_INTERIX="Interix" # Windows Services for UNIX
+OS_MINGW="MinGW"
+OS_MSYS="MSys" # Part of MinGW (Minimal GNU for Windows)
+OS_NONSTOP="NonStop"
+OS_OSX="OS X"
+OS_SOLARIS="Solaris"
+OS_SUNOS="SunOS"
+OS_UWIN="UWIN" # AT&T Unix subsystem for Windows
+OS_WIN32="Windows 32-bit" # Win95, Win98, WinME, etc.
+OS_WINNT="Windows NT" # WinNT, Win2K, WinXP, WinVista, Win7+
+
+uname="$(uname -s)"
+
+case "$uname" in
+	*BSD)		OS="$OS_BSD" ;;
+	*BSDi)		OS="$OS_BSD" ;;
+	"BSD/OS")	OS="$OS_BSD" ;;
+	CYGWIN*)	OS="$OS_CYGWIN" ;;
+	Darwin)		OS="$OS_OSX" ;;
+	GNU)		OS="$OS_LINUX" ;;
+	MINGW*)		OS="$OS_MINGW" ;;
+	NONSTOP*)	OS="$OS_NONSTOP" ;;
+	Solaris*)	OS="$OS_SOLARIS" ;;
+	UWIN*)		OS="$OS_UWIN" ;;
+	win32)		OS="$OS_WIN32" ;;
+	win64)		OS="$OS_WIN64" ;; # I'm guessing on this one. ~RuneImp
+	*)			OS="$system" ;;
+esac
+
+# echo "\$uname: $uname"
+# echo "\$OS: $OS"
+# exit 0
+
+db_path="/usr/local/var/mongodb/wiredTiger"
+db_store="wiredTiger" # wiredTiger or mmapv1
+log_path="/usr/local/var/log/mongodb/output.log"
+
 if [ $# -eq 0 ]; then
 	echo
 	echo "Yes?"
 	echo
 	echo "Try adding a command such as: start, stop, info, etc."
 	echo
-	# mongod --dbpath /usr/local/var/mongodb/wiredTiger --storageEngine wiredTiger --wiredTigerCacheSizeGB 1 --httpinterface --fork --noauth --rest
-	# --wiredTigerDirectoryForIndexes false
-	# --wiredTigerCacheSizeGB `half of RAM`
-	# --wiredTigerCollectionBlockCompressor snappy zlib none
-	# --wiredTigerIndexPrefixCompression true
-	# --directoryperdb
-	# --journal (on by default on)
-	# --httpinterface
-	# --fork
-	# --noauth
-	# --rest
-	# --sysinfo
 else
 	if [ $1 == 'start' ]; then
 		echo "Starting MongoDB"
-		mongod --dbpath /usr/local/var/mongodb/wiredTiger --storageEngine wiredTiger --wiredTigerCacheSizeGB 1 --httpinterface --fork --logpath /usr/local/var/log/mongodb/output.log --noauth --rest
+		if [[ $2 == 'interactive' ]]; then
+			mongod --dbpath "$db_path" --storageEngine "$db_store" --wiredTigerCacheSizeGB 1 --logpath "$log_path" --httpinterface --noauth --rest
+		else
+			mongod --dbpath "$db_path" --storageEngine "$db_store" --wiredTigerCacheSizeGB 1 --logpath "$log_path" --httpinterface --noauth --rest --fork
+		fi
+		# --wiredTigerDirectoryForIndexes false
+		# --wiredTigerCacheSizeGB `half of RAM`
+		# --wiredTigerCollectionBlockCompressor snappy zlib none
+		# --wiredTigerIndexPrefixCompression true
+		# --directoryperdb
+		# --journal (on by default on 2.6+)
+		# --httpinterface
+		# --fork
+		# --noauth
+		# --rest
+		# --sysinfo
 	elif [ $1 == 'stop' ]; then
 		echo "Stoping MongoDB"
-		# mongod --shutdown --dbpath /usr/local/var/mongodb/wiredTiger
-		# mongo --eval "db = new Mongo(); db.getDB('admin').shutdownServer()"
-		mongo --eval "db = connect('localhost:27017/admin'); db.shutdownServer();"
+		if [[ $OS == "$OS_LINUX" ]]; then
+			mongod --shutdown
+			# mongod --shutdown --dbpath "$db_path"
+		else
+			mongo admin --quiet --eval "db.shutdownServer();"
+		fi
 	elif [ $1 == 'info' ]; then
-		mongod --sysinfo
+		if [[ $2 == 'build' ]]; then
+			mongo --quiet --eval 'db.runCommand("buildInfo")'
+		elif [[ $2 == 'storage' ]]; then
+			mongo --quiet --eval "db.serverStatus().storageEngine.name"
+		else
+			mongod --sysinfo
+		fi
+	elif [ $1 == 'status' ]; then
+		mongo --quiet --eval "db.serverStatus()"
+	elif [ $1 == 'version' ]; then
+		mongod --version
 	else
-		echo "WTF? What is '${1}' supposed to do?"
+		echo "WTF? What is the '${1}' command supposed to do?"
 		exit 1
 	fi
 fi
