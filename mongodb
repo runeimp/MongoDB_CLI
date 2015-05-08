@@ -3,7 +3,7 @@
 # mongodb COMMAND
 #
 # @author   RuneImp <runeimp@gmail.com>
-# @version  0.3.0
+# @version  0.3.1
 # @license  http://opensource.org/licenses/MIT
 #
 ###
@@ -25,6 +25,7 @@
 ###
 # ChangeLog:
 # ----------
+# 2015-05-04	v0.3.1	Added test for user config and sets defaults if not present. Also added version number for this script.
 # 2015-04-30	v0.3.0	Setup config system
 # 2015-04-30	v0.2.1	Fixed JSON output for 'info build' and status.
 # 2015-04-29	v0.2.0	Added the 'info build', 'info storage', status, and version commands.
@@ -40,8 +41,19 @@
 
 uname=`uname`
 OS=`ostype`
+USER_CONFIG="$HOME/.config/mongodb.cfg"
+VERSION_NUMBER='0.3.1'
+VERSION_LABEL="  MongoDB CLI v$VERSION_NUMBER"
 
-source "$user_config"
+if [ -e "$USER_CONFIG" ]; then
+	source "$USER_CONFIG"
+else
+	# echo "DEBUG:   User config not found. Using defaults."
+	USER_CONFIG=''
+	db_path="/usr/local/var/mongodb/wiredTiger"
+	db_store="wiredTiger" # wiredTiger or mmapv1
+	log_path="/usr/local/var/log/mongodb/output.log"
+fi
 
 # echo "\$OS: $OS ($uname)"
 # echo "\$db_path: $db_path"
@@ -82,6 +94,13 @@ else
 		else
 			mongo admin --quiet --eval "db.shutdownServer();"
 		fi
+	elif [ $1 == 'help' ]; then
+		echo "$VERSION_LABEL"
+		echo
+		echo "  Help info..."
+		echo
+	elif [[ $1 == '--version' || $2 == '--version' ]]; then
+		echo "$VERSION_LABEL"
 	elif [ $1 == 'info' ]; then
 		if [[ $2 == 'build' ]]; then
 			mongo --quiet --eval 'JSON.stringify( db.runCommand("buildInfo"), null, 4 )'
