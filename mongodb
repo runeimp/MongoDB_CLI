@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+###########
+# mongodb COMMAND
+#
+# @author   RuneImp <runeimp@gmail.com>
+# @version  0.1.0
+# @license  http://opensource.org/licenses/MIT
+#
+###
+# show_usage:
+# ------
+# $ mongodb start
+# $ mongodb stop
+# 
+###
+# Installation
+# ------------
+# 1. mktime must be in your path and executable.
+# 
+###
+# Error Codes:
+# ------------
+#  1 = WFT?
+#
+###
+# ChangeLog:
+# ----------
+#	2015-04-24	v0.1.0	Initial script creation
+# 
+###
+# ToDo:
+# -----
+# [ ] ____
+#
+
+if [ $# -eq 0 ]; then
+	echo
+	echo "Yes?"
+	echo
+	echo "Try adding a command such as: start, stop, info, etc."
+	echo
+	# mongod --dbpath /usr/local/var/mongodb/wiredTiger --storageEngine wiredTiger --wiredTigerCacheSizeGB 1 --httpinterface --fork --noauth --rest
+	# --wiredTigerDirectoryForIndexes false
+	# --wiredTigerCacheSizeGB `half of RAM`
+	# --wiredTigerCollectionBlockCompressor snappy zlib none
+	# --wiredTigerIndexPrefixCompression true
+	# --directoryperdb
+	# --journal (on by default on)
+	# --httpinterface
+	# --fork
+	# --noauth
+	# --rest
+	# --sysinfo
+else
+	if [ $1 == 'start' ]; then
+		echo "Starting MongoDB"
+		mongod --dbpath /usr/local/var/mongodb/wiredTiger --storageEngine wiredTiger --wiredTigerCacheSizeGB 1 --httpinterface --fork --logpath /usr/local/var/log/mongodb/output.log --noauth --rest
+	elif [ $1 == 'stop' ]; then
+		echo "Stoping MongoDB"
+		# mongod --shutdown --dbpath /usr/local/var/mongodb/wiredTiger
+		# mongo --eval "db = new Mongo(); db.getDB('admin').shutdownServer()"
+		mongo --eval "db = connect('localhost:27017/admin'); db.shutdownServer();"
+	elif [ $1 == 'info' ]; then
+		mongod --sysinfo
+	else
+		echo "WTF? What is '${1}' supposed to do?"
+		exit 1
+	fi
+fi
+
+exit 0
