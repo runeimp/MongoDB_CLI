@@ -1,0 +1,243 @@
+#!/usr/bin/env bash
+###########
+# Installer for MongoDB CLI
+#
+# @author   RuneImp <runeimp@gmail.com>
+# @version  0.1.0
+# @license  http://opensource.org/licenses/MIT
+#
+###
+# show_usage:
+# ------
+# $ install
+# 
+###
+# Error Codes:
+# ------------
+#  1 = WFT?
+#
+###
+# ChangeLog:
+# ----------
+# 2015-05-08	v0.1.0	Initial script creation
+# 
+###
+# ToDo:
+# -----
+# [ ] ____
+#
+
+BIN_SUDO=false
+HOME_BIN="$HOME/bin"
+INSTALL_VERSION="0.1.0"
+LIB_SUDO=false
+
+###
+# Install Functions
+#
+function copy_bin()
+{
+	cd `dirname "$0"`
+	path=`pwd -P`
+	# echo "cp ${path}/mongodb $1/mongodb"
+	# echo "cp ${path}/ostype $1/ostype"
+	copy_it "${path}/mongodb" "$1/mongodb" $2
+	if [[ $? ]]; then
+		copy_it "${path}/ostype" "$1/ostype" $2
+	fi
+}
+
+function copy_it()
+{
+	# echo "copy_it() '$1' '$2' '$3'"
+	local overwrite=false
+	if [[ ! -z $3 ]]; then
+		if [[ $LIB_SUDO == true ]]; then
+			sudo cp "$1" "$2"
+		else
+			cp "$1" "$2"
+		fi
+	elif [[ -e $2 ]]; then
+		read -p "`basename "$2"` already exist at destination. Overwrite? [y/n]: " overwrite
+		overwrite=`parse_boolean "$overwrite"`
+		if [[ $overwrite == 'true' ]]; then
+			if [[ $LIB_SUDO == true ]]; then
+				sudo cp "$1" "$2"
+			else
+				cp "$1" "$2"
+			fi
+		else
+			return 1
+		fi
+	else
+		if [[ $LIB_SUDO == true ]]; then
+			sudo cp "$1" "$2"
+		else
+			cp "$1" "$2"
+		fi
+	fi
+
+	if [[ $LIB_SUDO == true ]]; then
+		sudo chmod 755 "$2"
+	else
+		chmod 755 "$2"
+	fi
+}
+
+function link_bin()
+{
+	if [[ ! -z "$2" ]]; then
+		path="$2"
+	else
+		cd `dirname "$0"`
+		path=`pwd -P`
+	fi
+	# echo "ln -s ${path}/mongodb $1/mongodb"
+	# echo "ln -s ${path}/ostype $1/ostype"
+	
+
+	if [[ $BIN_SUDO == true ]]; then
+		sudo ln -s "${path}/mongodb" "$1/mongodb"
+		sudo ln -s "${path}/ostype" "$1/ostype"
+	else
+		ln -s "${path}/mongodb" "$1/mongodb"
+		ln -s "${path}/ostype" "$1/ostype"
+	fi
+}
+
+function parse_boolean()
+{
+	local result=`echo "$1" | tr '[:upper:]' '[:lower:]'`
+	result="${result:0:1}"
+	if [[ $result == 'y' || $result == 't' || $result == '1' ]]; then
+		result='true'
+	else
+		result='false'
+	fi
+	echo $result
+}
+
+
+read -p "Install MongoDB CLI for the local user only? [y/n]: " local_only
+local_only=$(parse_boolean "$local_only")
+# local_only=`echo "$local_only" | tr '[:upper:]' '[:lower:]'`
+# local_only="${local_only:0:1}"
+# echo "\$local_only: $local_only"
+
+if [[ "$local_only" == 'true' ]]; then
+	copy_binaries=false
+
+	if [[ -d "$HOME_BIN" ]]; then
+		copy_binaries=true
+	else
+		read -p "$HOME_BIN doesn't exist. Create it? [y/n]: " create_homebin
+		create_homebin=$(parse_boolean "$create_homebin")
+		# echo "\$create_homebin: $create_homebin"
+	fi
+
+	if [[ $create_homebin == 'true' ]]; then
+		mkdir -p "$HOME_BIN"
+		copy_binaries=true
+	fi
+
+	if [[ $copy_binaries ]]; then
+		copy_bin "$HOME_BIN"
+		if [[ $? ]]; then
+			echo
+			echo "Install complete!  :-)"
+			if [[ $create_homebin == 'true' ]]; then
+				echo
+				echo "Be sure to add '$HOME_BIN' (sans quotes) to your \$PATH"
+			fi
+		else
+			echo "Problem copying binaries"
+		fi
+	fi
+else
+	if [[ -d "/opt" ]]; then
+		LIB_DIR="/opt"
+		LIB_SUDO=true
+		CHOWN_USER=true
+	elif [[ -d "/usr/local/libexec" ]]; then
+		LIB_DIR="/usr/local/libexec"
+		LIB_SUDO=false
+	elif [[ -d "/usr/libexec" ]]; then
+		LIB_DIR="/usr/libexec"
+		LIB_SUDO=true
+	elif [[ -d "/usr/local" ]]; then
+		LIB_DIR="/usr/local"
+		LIB_SUDO=true
+	else
+		LIB_DIR="/usr"
+		LIB_SUDO=true
+	fi
+
+
+	if [[ -d "/usr/local/opt" && ! -d "/usr/local/opt/mongodb" ]]; then
+		BIN_DIR="/usr/local/opt"
+		BIN_SUDO=false
+	elif [[ -d "/opt/bin" ]]; then
+		BIN_DIR="/opt/bin"
+		BIN_SUDO=true
+	elif [[ -d "/usr/local/bin" ]]; then
+		BIN_DIR="/usr/local/bin"
+		BIN_SUDO=false
+	else
+		BIN_DIR="/usr/bin"
+		BIN_SUDO=true
+	fi
+
+	# INSTALL_DIR="$LIB_DIR/mongodb_cli-`./mongodb --version --terse`"
+	INSTALL_DIR="$LIB_DIR/mongodb_cli"
+
+	echo
+	echo "Library directory: $LIB_DIR"
+	echo "Install directory $INSTALL_DIR"
+	echo "Binaries directory: $BIN_DIR"
+	echo "Library SUDO: $LIB_SUDO"
+	echo "Binaries SUDO: $BIN_SUDO"
+	echo
+
+
+	if [[ -d "$INSTALL_DIR" ]]; then
+		read -p "MongoDB CLI already installed. Upgrade? [y/n]: " upgrade
+		upgrade=$(parse_boolean "$upgrade")
+
+		if [[ $upgrade == 'true' ]]; then
+			copy_bin "$INSTALL_DIR" 'force'
+			link_bin "$BIN_DIR" "$INSTALL_DIR"
+		fi
+	else
+		# mkdir -p "$INSTALL_DIR"
+		# tester='tester'
+		if [[ $LIB_SUDO == true ]]; then
+			sudo mkdir -p "$INSTALL_DIR"
+			if [[ $CHOWN_USER == true ]]; then
+				sudo chown -R "$USER" "$INSTALL_DIR"
+			fi
+		else
+			mkdir -p "$INSTALL_DIR"
+		fi
+
+		create_bindir=false
+		if [[ ! -d "$BIN_DIR" ]]; then
+			sudo mkdir -p "$BIN_DIR"
+			create_bindir=true
+		fi
+		copy_bin "$INSTALL_DIR"
+		link_bin "$BIN_DIR" "$INSTALL_DIR"
+	fi
+	# echo "MongoDB Version: `./mongodb --version --terse`"
+	# echo "Installing to $INSTALL_DIR"
+
+	echo
+	echo "Install complete!  :-)"
+	if [[ $create_bindir ]]; then
+		echo
+		echo "Be sure to add '$BIN_DIR' (sans quotes) to your \$PATH"
+	fi
+fi
+
+echo
+
+exit 0

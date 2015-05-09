@@ -26,6 +26,9 @@
 ###
 # ChangeLog:
 # ----------
+# 2015-05-08	v0.4.1	If ostype cannot be found it will use os-type if found. Otherwise OS will be 'Unknown'.
+# 						Add the --terse switch for simple version number retrieval.
+# 						Added the 'setup' command which calls the install script.
 # 2015-05-08	v0.4.0	Added support for native MongoDB config with auto find.
 # 2015-05-08	v0.3.3	Updated help.
 # 2015-05-07	v0.3.2	Made help useful, and defaulted 'info' to 'info build'.
@@ -43,9 +46,17 @@
 # [ ] ____
 #
 
+# HOME_BIN="$HOME/bin"
 uname=`uname`
-OS=`ostype`
 OS_LINUX='Linux'
+OS_UNKNOWN='Unknown'
+if [ `which 'ostype'` ]; then
+	OS=`ostype`
+elif [ `which 'os-type'` ]; then
+	OS=`os-type`
+else
+	OS="$OS_UNKNOWN"
+fi
 USER_CONFIG="$HOME/.config/mongodb.cfg"
 MONGO_CONFIG=''
 VERSION_NUMBER='0.4.0'
@@ -139,13 +150,19 @@ else
 		echo '    mongodb info build'
 		echo
 	elif [[ $1 == '--version' || $2 == '--version' ]]; then
-		echo "$VERSION_LABEL"
+		if [[ $2 == '--terse' || $3 == '--terse' ]]; then
+			echo "$VERSION_NUMBER"
+		else
+			echo "$VERSION_LABEL"
+		fi
 	elif [ $1 == 'info' ]; then
 		if [[ $2 == 'build' ]]; then
 			mongo --quiet --eval 'JSON.stringify( db.runCommand("buildInfo"), null, 4 )'
 		else
 			mongo --quiet --eval 'JSON.stringify( db.runCommand("buildInfo"), null, 4 )'
 		fi
+	elif [ $1 == 'setup' ]; then
+		./install
 	elif [ $1 == 'status' ]; then
 		mongo --quiet --eval "JSON.stringify( db.serverStatus(), null, 4 )"
 	elif [[ $2 == 'storage' ]]; then
