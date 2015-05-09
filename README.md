@@ -4,6 +4,12 @@ MongoDB CLI
 This is a simple Bash CLI script for managing a local `mongod` instance.
 
 
+Rational
+--------
+
+With the changes to MongoDB 3.x and utilizing the WiredTiger storage engine it seemed almost impossible to continue utilizing [launchctl][] ([lunchy][] in my case) for [`launchd`][] to autostart `mongod` and keep it running on OS X. So this script was created to handle launching my local `mongod` instance and has grown a bit and I still have some plants for it. Thus here it is on GitHub as open source. Hopefully it will be found useful to others.  :-)
+
+
 Installation
 ------------
 
@@ -49,16 +55,10 @@ mongodb --version
 This is a simple Bash script to get general platform information. Included as a helper for `mongodb`. It's not as detailed as some that are available as the deep Exim os-type script.
 
 
-Rational
---------
-
-With the changes to MongoDB 3.x and utilizing the WiredTiger storage engine it seemed almost impossible to continue utilizing [launchctl][] ([lunchy][] in my case) for [`launchd`][] to autostart `mongod` and keep it running on OS X. So this script was created to handle launching my local `mongod` instance and has grown a bit and I still have some plants for it. Thus here it is on GitHub as open source. Hopefully it will be found useful to others.  :-)
-
-
 ToDo
 ----
 
-* [x] Add `setup` command to auto link the scripts
+* [x] Add `--install` switch to auto link the scripts
 * [ ] Stuff, reasons, &hellip;
 
 [launchctl]:https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/launchctl.1.html
