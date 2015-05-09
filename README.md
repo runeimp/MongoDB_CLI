@@ -22,6 +22,8 @@ Usage
 * Commands are for managing `mongod`, etc.
 * Switches are for managing MongoDB CLI.
 
+### Examples
+
 ```
 # Get MongoDB CLI help
 mongodb help
