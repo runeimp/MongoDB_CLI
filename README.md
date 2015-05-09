@@ -7,7 +7,7 @@ This is a simple Bash CLI script for managing a local `mongod` instance.
 Rational
 --------
 
-With the changes to MongoDB 3.x and utilizing the WiredTiger storage engine it seemed almost impossible to continue utilizing [launchctl][] ([lunchy][] in my case) for [`launchd`][] to autostart `mongod` and keep it running on OS X. So this script was created to handle launching my local `mongod` instance and has grown a bit and I still have some plants for it. Thus here it is on GitHub as open source. Hopefully it will be found useful to others.  :-)
+With the changes to MongoDB 3.x and utilizing the WiredTiger storage engine it seemed almost impossible to continue utilizing <code>[launchctl][]</code> (<code>[lunchy][]</code> in my case) for <code>[launchd][]</code> to autostart `mongod` and keep it running on OS X. So this script was created to handle launching my local `mongod` instance and has grown a bit and I still have some plants for it. Thus here it is on GitHub as open source. Hopefully it will be found useful to others.  :-)
 
 
 Installation
