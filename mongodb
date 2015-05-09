@@ -3,7 +3,7 @@
 # mongodb COMMAND
 #
 # @author   RuneImp <runeimp@gmail.com>
-# @version  0.4.1
+# @version  0.5.0
 # @license  http://opensource.org/licenses/MIT
 #
 ###
@@ -26,6 +26,8 @@
 ###
 # ChangeLog:
 # ----------
+# 2015-05-08	v0.5.0	Changed the 'setup' command to '--install' (commands are for mongod management) and
+#						fixed the install/setup script reference.
 # 2015-05-08	v0.4.1	If ostype cannot be found it will use os-type if found. Otherwise OS will be 'Unknown'.
 # 						Add the --terse switch for simple version number retrieval.
 # 						Added the 'setup' command which calls the install script.
@@ -59,7 +61,7 @@ else
 fi
 USER_CONFIG="$HOME/.config/mongodb.cfg"
 MONGO_CONFIG=''
-VERSION_NUMBER='0.4.1'
+VERSION_NUMBER='0.5.0'
 VERSION_LABEL="MongoDB CLI v$VERSION_NUMBER"
 
 if [ -e "$USER_CONFIG" ]; then
@@ -161,8 +163,8 @@ else
 		else
 			mongo --quiet --eval 'JSON.stringify( db.runCommand("buildInfo"), null, 4 )'
 		fi
-	elif [ $1 == 'setup' ]; then
-		./install
+	elif [ $1 == '--install' ]; then
+		./mongodb-setup
 	elif [ $1 == 'status' ]; then
 		mongo --quiet --eval "JSON.stringify( db.serverStatus(), null, 4 )"
 	elif [[ $2 == 'storage' ]]; then

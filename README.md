@@ -7,11 +7,20 @@ This is a simple Bash CLI script for managing a local `mongod` instance.
 Installation
 ------------
 
-Ensure that `mongodb` is copied or linked into your path. On Linux systems be sure to include the `ostype` script as well so that the `mongodb` script can handle shutdown appropriately.
+From within the cloned repo run:
+
+```
+./mongodb --install
+```
 
 
 Usage
 -----
+
+### Conventions
+
+* Commands are for managing `mongod`, etc.
+* Switches are for managing MongoDB CLI.
 
 ```
 # Get MongoDB CLI help
@@ -28,6 +37,9 @@ mongodb storage
 
 # Show the version of mongod installed
 mongodb version
+
+# Show the version of MongoDB CLI
+mongodb --version
 ```
 
 ### `ostype`
@@ -38,13 +50,13 @@ This is a simple Bash script to get general platform information. Included as a 
 Rational
 --------
 
-With the changes to MongoDB 3.x and utilizing the WiredTiger storage engine it seemed almost impossible to continue utilizing [launchctl][] ([lunchy][] in my case) for [`launchd`][] to autostart `mongod` and keep it running. So this script was created to handle launching my local `mongod` instance and has grown a bit and I still have some plants for it. Thus here it is on GitHub as open source. Hopefully it will be found useful to others.  :-)
+With the changes to MongoDB 3.x and utilizing the WiredTiger storage engine it seemed almost impossible to continue utilizing [launchctl][] ([lunchy][] in my case) for [`launchd`][] to autostart `mongod` and keep it running on OS X. So this script was created to handle launching my local `mongod` instance and has grown a bit and I still have some plants for it. Thus here it is on GitHub as open source. Hopefully it will be found useful to others.  :-)
 
 
 ToDo
 ----
 
-* [ ] Add `setup` command to auto link the scripts
+* [x] Add `setup` command to auto link the scripts
 * [ ] Stuff, reasons, &hellip;
 
 [launchctl]:https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/launchctl.1.html

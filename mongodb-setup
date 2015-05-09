@@ -42,6 +42,7 @@ function copy_bin()
 	# echo "cp ${path}/mongodb $1/mongodb"
 	# echo "cp ${path}/ostype $1/ostype"
 	copy_it "${path}/mongodb" "$1/mongodb" $2
+	copy_it "${path}/mongodb-setup" "$1/mongodb-setup" $2
 	if [[ $? ]]; then
 		copy_it "${path}/ostype" "$1/ostype" $2
 	fi
@@ -58,7 +59,7 @@ function copy_it()
 			cp "$1" "$2"
 		fi
 	elif [[ -e $2 ]]; then
-		read -p "`basename "$2"` already exist at destination. Overwrite? [y/n]: " overwrite
+		read -p "`basename "$2"` already exist at destination. Update? [y/n]: " overwrite
 		overwrite=`parse_boolean "$overwrite"`
 		if [[ $overwrite == 'true' ]]; then
 			if [[ $LIB_SUDO == true ]]; then
@@ -98,6 +99,7 @@ function link_bin()
 
 	if [[ $BIN_SUDO == true ]]; then
 		sudo ln -s "${path}/mongodb" "$1/mongodb"
+		sudo ln -s "${path}/mongodb-setup" "$1/mongodb-setup"
 		sudo ln -s "${path}/ostype" "$1/ostype"
 	else
 		ln -s "${path}/mongodb" "$1/mongodb"
